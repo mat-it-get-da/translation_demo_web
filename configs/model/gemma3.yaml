@@ -1,0 +1,7 @@
+# Gemma 3 4B IT 모델 설정
+name: "Gemma-3-4b-it-GGUF"
+provider: "lemonade"
+temperature: 0.3
+max_tokens: 512
+top_p: 0.9
+
