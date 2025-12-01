@@ -39,7 +39,8 @@ app.add_middleware(
         "http://localhost:5173",
         "http://localhost:4173",
         "http://localhost:5174",
-    ],  # Vite 기본 포트
+        "https://mat-it-get-da.github.io",  # GitHub Pages
+    ],  # Vite 기본 포트 + GitHub Pages
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
