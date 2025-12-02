@@ -28,3 +28,9 @@ node_modules/
 # OS
 .DS_Store
 Thumbs.db
+
+# 환경 변수 (API 키 등) - 절대 커밋 금지!
+.env
+.env.local
+.env.production
+.env.*.local

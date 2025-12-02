@@ -1,24 +1,24 @@
 """
-Lemonade Server 모델 설정 및 매핑
+OpenAI API 모델 설정 및 매핑
 
-프론트엔드에 표시될 모델명과 실제 Lemonade Server 모델 ID를 매핑합니다.
+프론트엔드에 표시될 모델명과 실제 OpenAI 모델 ID를 매핑합니다.
 """
 
 from typing import Dict, List
 
-# 사용 가능한 Lemonade 모델 정의
+# 사용 가능한 OpenAI 모델 정의
 AVAILABLE_MODELS: Dict[str, Dict[str, str]] = {
-    "Qwen3-4B-Instruct-2507-GGUF": {
-        "display_name": "Qwen3-4B-Instruct",
-        "description": "Alibaba의 Qwen3 4B 모델 - 경량화된 고성능 모델",
+    "gpt-3.5-turbo": {
+        "display_name": "GPT-3.5 Turbo",
+        "description": "OpenAI의 가성비 좋은 모델 - 빠른 응답 속도",
     },
-    "Gemma-3-4b-it-GGUF": {
-        "display_name": "Gemma-3-4B-IT",
-        "description": "Google의 Gemma 3 4B 모델 - 지시 사항 최적화",
+    "gpt-4o-mini": {
+        "display_name": "GPT-4o Mini",
+        "description": "OpenAI의 빠르고 저렴한 최신 모델 - 번역에 최적화",
     },
-    "gpt-oss-20b-mxfp4-GGUF": {
-        "display_name": "GPT-OSS-20B",
-        "description": "오픈소스 GPT 20B 모델 - 대용량 범용 모델",
+    "gpt-4o": {
+        "display_name": "GPT-4o",
+        "description": "OpenAI의 가장 강력한 모델 - 최고 품질 번역",
     },
 }
 
@@ -68,13 +68,13 @@ def get_full_model_name(model_id: str) -> str:
     """
     모델 ID 유효성 검사 및 반환
     
-    Lemonade Server는 모델 ID를 그대로 사용하므로 
+    OpenAI API는 모델 ID를 그대로 사용하므로 
     유효성 검사 후 동일한 ID를 반환합니다.
     
     Parameters
     ----------
     model_id : str
-        모델 ID (예: "Qwen3-4B-Instruct-2507-GGUF")
+        모델 ID (예: "gpt-4o-mini")
     
     Returns
     -------

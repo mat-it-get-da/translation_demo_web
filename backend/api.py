@@ -1,7 +1,7 @@
 """
 FastAPI 번역 서버
 
-Lemonade Server를 사용한 번역 API 서버
+OpenAI API를 사용한 번역 API 서버
 """
 
 import os
@@ -9,10 +9,14 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from openai import OpenAI
+
+# .env 파일 로드
+load_dotenv()
 
 # 프로젝트 루트를 Python 경로에 추가
 project_root = Path(__file__).parent.parent
@@ -28,8 +32,8 @@ from backend.models_config import (
 # FastAPI 앱 초기화
 app = FastAPI(
     title="Translation API",
-    description="Lemonade Server 기반 번역 API",
-    version="1.0.0",
+    description="OpenAI API 기반 번역 서비스",
+    version="2.0.0",
 )
 
 # CORS 설정 (프론트엔드 통신 허용)
@@ -46,17 +50,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Lemonade Server 클라이언트 초기화
-try:
-    lemonade_client = OpenAI(
-        base_url="http://localhost:8000/api/v1",
-        api_key="lemonade"  # required but unused
-    )
-    print("[OK] Lemonade Server 클라이언트 초기화 성공")
-    print("[INFO] Lemonade Server: http://localhost:8000")
-except Exception as e:
-    print(f"[ERROR] Lemonade Server 클라이언트 초기화 실패: {e}")
-    lemonade_client = None
+# OpenAI 클라이언트 초기화
+openai_api_key = os.getenv("OPENAI_API_KEY")
+
+if not openai_api_key:
+    print("[ERROR] OPENAI_API_KEY 환경 변수가 설정되지 않았습니다!")
+    print("[INFO] .env 파일을 생성하고 API 키를 추가하세요.")
+    print("[INFO] 예: OPENAI_API_KEY=sk-your-api-key-here")
+    openai_client = None
+else:
+    try:
+        openai_client = OpenAI(api_key=openai_api_key)
+        print("[OK] OpenAI 클라이언트 초기화 성공")
+        print(f"[INFO] API 키: {openai_api_key[:8]}...")
+    except Exception as e:
+        print(f"[ERROR] OpenAI 클라이언트 초기화 실패: {e}")
+        openai_client = None
 
 
 # Request/Response 모델
@@ -136,11 +145,11 @@ async def translate(request: TranslateRequest):
     HTTPException
         번역 실패 시
     """
-    # Lemonade 클라이언트 확인
-    if lemonade_client is None:
+    # OpenAI 클라이언트 확인
+    if openai_client is None:
         raise HTTPException(
             status_code=500,
-            detail="Lemonade Server 클라이언트가 초기화되지 않았습니다. 서버를 확인하세요.",
+            detail="OpenAI 클라이언트가 초기화되지 않았습니다. OPENAI_API_KEY를 확인하세요.",
         )
     
     # 모델명 확인 및 검증
@@ -165,7 +174,7 @@ Provide ONLY the translated text without any explanations or additional comments
     
     # API 호출
     try:
-        response = lemonade_client.chat.completions.create(
+        response = openai_client.chat.completions.create(
             model=model_name,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -191,12 +200,12 @@ Provide ONLY the translated text without any explanations or additional comments
         if "NOT_FOUND" in error_msg or "not found" in error_msg.lower():
             raise HTTPException(
                 status_code=404,
-                detail=f"모델을 찾을 수 없습니다: {model_name}. Lemonade Server에서 모델을 다운로드했는지 확인하세요.",
+                detail=f"모델을 찾을 수 없습니다: {model_name}. 유효한 OpenAI 모델인지 확인하세요.",
             )
-        elif "Connection" in error_msg or "connect" in error_msg.lower():
+        elif "api_key" in error_msg.lower() or "authentication" in error_msg.lower():
             raise HTTPException(
-                status_code=503,
-                detail="Lemonade Server에 연결할 수 없습니다. 서버가 실행 중인지 확인하세요 (http://localhost:8000)",
+                status_code=401,
+                detail="OpenAI API 키가 유효하지 않습니다. OPENAI_API_KEY를 확인하세요.",
             )
         else:
             raise HTTPException(
@@ -217,8 +226,8 @@ async def health_check():
     """
     return {
         "status": "healthy",
-        "lemonade_client": "initialized" if lemonade_client else "not initialized",
-        "lemonade_server": "http://localhost:8000",
+        "openai_client": "initialized" if openai_client else "not initialized",
+        "api_provider": "OpenAI",
     }
 
 

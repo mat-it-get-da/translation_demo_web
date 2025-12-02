@@ -1,7 +1,7 @@
 """
 FastAPI 서버 실행 스크립트
 
-Lemonade Server 기반 번역 API 서버를 실행합니다.
+OpenAI API 기반 번역 API 서버를 실행합니다.
 
 실행 방법:
     rye run python -m backend.run_server
@@ -9,18 +9,15 @@ Lemonade Server 기반 번역 API 서버를 실행합니다.
     rye run python backend/run_server.py
 
 주의사항:
-    - Lemonade Server가 http://localhost:8000에서 실행 중이어야 합니다
-    - 사용할 모델을 미리 다운로드해야 합니다:
-      lemonade-server pull Qwen3-4B-Instruct-2507-GGUF
-      lemonade-server pull Gemma-3-4b-it-GGUF
-      lemonade-server pull gpt-oss-20b-mxfp4-GGUF
+    - .env 파일에 OPENAI_API_KEY가 설정되어 있어야 합니다
+    - API 키 발급: https://platform.openai.com/api-keys
 """
 
 import uvicorn
 
 if __name__ == "__main__":
     print("=" * 80)
-    print("FastAPI 번역 서버 시작 (Lemonade Server 기반)")
+    print("FastAPI 번역 서버 시작 (OpenAI API 기반)")
     print("=" * 80)
     print()
     print("📍 서버 정보:")
@@ -33,14 +30,13 @@ if __name__ == "__main__":
     print("  - POST /api/translate - 텍스트 번역")
     print("  - GET  /health        - 헬스 체크")
     print()
-    print("⚙️  Lemonade Server:")
-    print("  - 주소: http://localhost:8000")
-    print("  - 포트 8000은 Lemonade Server 전용")
-    print("  - 포트 8001은 번역 API 서버 전용")
+    print("⚙️  OpenAI API:")
+    print("  - 사용 모델: GPT-3.5 Turbo, GPT-4o Mini, GPT-4o")
+    print("  - API 키는 .env 파일에서 로드됩니다")
     print()
     print("⚠️  시작 전 확인사항:")
-    print("  1. Lemonade Server가 실행 중인지 확인")
-    print("  2. 사용할 모델이 다운로드되어 있는지 확인")
+    print("  1. .env 파일에 OPENAI_API_KEY가 설정되어 있는지 확인")
+    print("  2. API 키 발급: https://platform.openai.com/api-keys")
     print()
     print("서버를 중지하려면 Ctrl+C를 누르세요.")
     print("=" * 80)

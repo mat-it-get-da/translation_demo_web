@@ -1,18 +1,19 @@
 # Project Wed - AI 번역 서비스
 
-Lemonade Server 기반의 다중 언어 번역 웹 애플리케이션입니다. 여러 오픈소스 LLM 모델을 활용하여 번역을 제공합니다.
+OpenAI API 기반의 다중 언어 번역 웹 애플리케이션입니다. GPT-3.5, GPT-4o Mini, GPT-4o 모델을 활용하여 고품질 번역을 제공합니다.
 
 ## 주요 기능
 
 - 🌐 **다중 언어 지원**: 한국어, 영어, 일본어, 중국어, 스페인어, 프랑스어, 독일어
-- 🤖 **다중 모델 선택**: Qwen3-4B, Gemma-3-4B, GPT-OSS-20B 등 여러 모델 지원
+- 🤖 **OpenAI 모델 선택**: GPT-3.5 Turbo, GPT-4o Mini, GPT-4o
+- ⚡ **실시간 번역**: 빠른 API 응답과 사용자 친화적인 UI
 - 📊 **번역 히스토리**: 번역 기록 관리 및 시간 측정
 
 ## 시스템 요구사항
 
 - **Python**: 3.8 이상
 - **Node.js**: 16 이상
-- **Lemonade Server**: LLM 추론 엔진
+- **OpenAI API 키**: https://platform.openai.com/api-keys
 - **패키지 매니저**: Rye (Python), pnpm (Node.js)
 
 ## 설치 방법
@@ -20,38 +21,28 @@ Lemonade Server 기반의 다중 언어 번역 웹 애플리케이션입니다. 
 ### 1. 저장소 클론
 
 ```bash
-git clone <repository-url>
-cd Project_Wed
+git clone https://github.com/mat-it-get-da/translation_demo_web.git
+cd translation_demo_web
 ```
 
-### 2. Lemonade Server 설치 및 실행
+### 2. 환경 변수 설정
 
-Lemonade Server는 LLM 모델을 로컬에서 실행하기 위한 추론 엔진입니다.
+OpenAI API 키를 설정합니다:
 
 ```bash
-# Lemonade Server 설치 (방법은 공식 문서 참조)
-# https://github.com/lemonade-hq/lemonade-server
+# .env.example을 복사하여 .env 파일 생성
+cp .env.example .env  # Linux/Mac
+copy .env.example .env  # Windows
 
-# Lemonade Server 실행 (포트 8000)
-lemonade-server serve
+# .env 파일을 열고 실제 API 키 입력
+# OPENAI_API_KEY=sk-your-actual-api-key-here
 ```
 
-### 3. 모델 다운로드
+**API 키 발급**: https://platform.openai.com/api-keys
 
-사용할 LLM 모델을 Lemonade Server에 다운로드합니다:
+⚠️ **주의**: `.env` 파일은 절대로 Git에 커밋하지 마세요! (`.gitignore`에 이미 추가되어 있습니다)
 
-```bash
-# Qwen3 4B 모델
-lemonade-server pull Qwen3-4B-Instruct-2507-GGUF
-
-# Gemma 3 4B 모델
-lemonade-server pull Gemma-3-4b-it-GGUF
-
-# GPT-OSS 20B 모델 (대용량)
-lemonade-server pull gpt-oss-20b-mxfp4-GGUF
-```
-
-### 4. Python 백엔드 설정
+### 3. Python 백엔드 설정
 
 ```bash
 # Rye가 설치되어 있지 않다면 먼저 설치
@@ -61,7 +52,7 @@ lemonade-server pull gpt-oss-20b-mxfp4-GGUF
 rye sync
 ```
 
-### 5. 프론트엔드 설정
+### 4. 프론트엔드 설정
 
 ```bash
 # my-app 디렉토리로 이동
@@ -76,20 +67,9 @@ pnpm install
 
 ## 실행 방법
 
-### 1. Lemonade Server 시작
+### 1. 백엔드 API 서버 시작
 
 터미널 1에서:
-
-```bash
-lemonade-server serve
-```
-
-- **주소**: http://localhost:8000
-- **역할**: LLM 모델 추론 엔진
-
-### 2. 백엔드 API 서버 시작
-
-터미널 2에서:
 
 ```bash
 # 프로젝트 루트에서
@@ -98,11 +78,11 @@ rye run python -m backend.run_server
 
 - **주소**: http://localhost:8001
 - **API 문서**: http://localhost:8001/docs
-- **역할**: 번역 API 제공
+- **역할**: OpenAI API를 사용한 번역 서비스
 
-### 3. 프론트엔드 개발 서버 시작
+### 2. 프론트엔드 개발 서버 시작
 
-터미널 3에서:
+터미널 2에서:
 
 ```bash
 # my-app 디렉토리에서
@@ -126,18 +106,22 @@ pnpm dev
 ## 프로젝트 구조
 
 ```
-Project_Wed/
+translation_demo_web/
 ├── backend/              # FastAPI 백엔드
-│   ├── api.py           # API 엔드포인트
-│   ├── models_config.py # 모델 설정
+│   ├── api.py           # API 엔드포인트 (OpenAI 연결)
+│   ├── models_config.py # OpenAI 모델 설정
 │   └── run_server.py    # 서버 실행 스크립트
 ├── my-app/              # SvelteKit 프론트엔드
 │   ├── src/
 │   │   ├── components/  # UI 컴포넌트
 │   │   └── routes/      # 페이지 라우트
 │   └── package.json
-├── configs/             # 설정 파일
-│   └── model/          # 모델별 설정
+├── configs/             # Hydra 설정 파일
+│   ├── config.yaml      # 메인 설정
+│   └── model/           # OpenAI 모델별 설정
+├── .env                 # 환경 변수 (API 키, Git에 미포함)
+├── .env.example         # 환경 변수 템플릿
+├── .gitignore           # Git 제외 파일 목록
 ├── pyproject.toml       # Python 프로젝트 설정
 └── README.md
 ```
@@ -153,9 +137,14 @@ Project_Wed/
 {
   "models": [
     {
-      "id": "Qwen3-4B-Instruct-2507-GGUF",
-      "name": "Qwen3-4B-Instruct",
-      "description": "Alibaba의 Qwen3 4B 모델 - 경량화된 고성능 모델"
+      "id": "gpt-3.5-turbo",
+      "name": "GPT-3.5 Turbo",
+      "description": "OpenAI의 가성비 좋은 모델 - 빠른 응답 속도"
+    },
+    {
+      "id": "gpt-4o-mini",
+      "name": "GPT-4o Mini",
+      "description": "OpenAI의 빠르고 저렴한 최신 모델 - 번역에 최적화"
     }
   ]
 }
@@ -171,7 +160,7 @@ Project_Wed/
   "text": "Hello, world!",
   "source_lang": "en",
   "target_lang": "ko",
-  "model": "Qwen3-4B-Instruct-2507-GGUF"
+  "model": "gpt-4o-mini"
 }
 ```
 
@@ -179,7 +168,7 @@ Project_Wed/
 ```json
 {
   "translated_text": "안녕하세요, 세상!",
-  "model": "Qwen3-4B-Instruct-2507-GGUF",
+  "model": "gpt-4o-mini",
   "source_lang": "en",
   "target_lang": "ko"
 }
@@ -187,30 +176,33 @@ Project_Wed/
 
 ## 문제 해결
 
-### Lemonade Server 연결 실패
+### OpenAI API 키 오류
 
 ```
-Error: Lemonade Server에 연결할 수 없습니다
-```
-
-**해결방법:**
-- Lemonade Server가 실행 중인지 확인: `lemonade-server serve`
-- http://localhost:8000 접속 가능 여부 확인
-
-### 모델을 찾을 수 없음
-
-```
-Error: 모델을 찾을 수 없습니다
+Error: OpenAI 클라이언트가 초기화되지 않았습니다
 ```
 
 **해결방법:**
-- 모델이 다운로드되었는지 확인
-- `lemonade-server pull <model-name>` 명령으로 모델 다운로드
+- `.env` 파일이 프로젝트 루트에 있는지 확인
+- `OPENAI_API_KEY`가 올바르게 설정되었는지 확인
+- API 키 형식: `sk-...`로 시작
+- API 키 재발급: https://platform.openai.com/api-keys
+
+### API 사용량 초과
+
+```
+Error: You exceeded your current quota
+```
+
+**해결방법:**
+- OpenAI 대시보드에서 사용량 확인: https://platform.openai.com/usage
+- 결제 방법 추가 또는 크레딧 충전
+- 사용량 제한 설정: https://platform.openai.com/account/limits
 
 ### 포트 충돌
 
 **해결방법:**
-- 포트 8000, 8001, 5173이 사용 중이지 않은지 확인
+- 포트 8001, 5173이 사용 중이지 않은지 확인
 - 다른 포트를 사용하려면 코드에서 포트 번호 변경
 
 ## 개발

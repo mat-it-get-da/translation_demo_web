@@ -1,7 +1,0 @@
-# GPT OSS 20B 모델 설정
-name: "gpt-oss-20b-mxfp4-GGUF"
-provider: "lemonade"
-temperature: 0.3
-max_tokens: 512
-top_p: 0.9
-

@@ -1,0 +1,6 @@
+# GPT-4o Mini 모델 설정 (가성비 최고)
+name: "gpt-4o-mini"
+provider: "openai"
+temperature: 0.3
+max_tokens: 512
+

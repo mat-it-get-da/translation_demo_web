@@ -33,8 +33,6 @@ colorama==0.4.6
     # via uvicorn
 distro==1.9.0
     # via openai
-dotenv==0.9.9
-    # via project-wed
 fastapi==0.121.1
     # via project-wed
 h11==0.16.0
@@ -65,7 +63,6 @@ pydantic==2.12.4
 pydantic-core==2.41.5
     # via pydantic
 python-dotenv==1.2.1
-    # via dotenv
     # via project-wed
     # via uvicorn
 pyyaml==6.0.3
