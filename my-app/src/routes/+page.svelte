@@ -1,12 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Models from "../components/models.svelte";
-    import Langs from "../components/langs.svelte";
+    import LangModal from "../components/LangModal.svelte";
     import TranslationTimer from "../components/TranslationTimer.svelte";
     import TranslationHistory from "../components/TranslationHistory.svelte";
 
     // API 기본 URL
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001";
+    const API_BASE_URL =
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:8001";
 
     // 모델 정보 타입
     interface ModelInfo {
@@ -33,15 +34,7 @@
     let selectedAIModel: string = "";
 
     // 자연어 리스트
-    let languages: string[] = [
-        "한국어",
-        "English",
-        "日本語",
-        "中文",
-        "Español",
-        "Français",
-        "Deutsch",
-    ];
+    let languages: string[] = ["한국어", "English", "日本語", "中文"];
 
     // 언어 코드 매핑
     const languageCodeMap: { [key: string]: string } = {
@@ -49,9 +42,6 @@
         English: "en",
         日本語: "ja",
         中文: "zh",
-        Español: "es",
-        Français: "fr",
-        Deutsch: "de",
     };
 
     // 선택된 입력 언어
@@ -93,7 +83,6 @@
 
             if (!response.ok) {
                 throw new Error(
-                    
                     `모델 목록을 가져오는데 실패했습니다: ${response.status}`,
                 );
             }
@@ -284,7 +273,7 @@
     <div class="language-selection">
         <div class="lang-item">
             <p>입력 언어:</p>
-            <Langs
+            <LangModal
                 langList={languages}
                 bind:selectedLang={selectedInputLanguage}
                 placeholder="입력 언어 선택"
@@ -293,7 +282,7 @@
 
         <div class="lang-item">
             <p>출력 언어:</p>
-            <Langs
+            <LangModal
                 langList={languages}
                 bind:selectedLang={selectedOutputLanguage}
                 placeholder="출력 언어 선택"
