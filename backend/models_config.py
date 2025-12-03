@@ -1,24 +1,47 @@
 """
-OpenAI API 모델 설정 및 매핑
+번역 API 모델 설정 및 매핑
 
-프론트엔드에 표시될 모델명과 실제 OpenAI 모델 ID를 매핑합니다.
+OpenAI, Google Translate, DeepL 모델을 지원합니다.
+프론트엔드에 표시될 모델명과 실제 모델 ID를 매핑합니다.
 """
 
 from typing import Dict, List
 
-# 사용 가능한 OpenAI 모델 정의
+# 사용 가능한 번역 모델 정의 (OpenAI, Google, DeepL)
 AVAILABLE_MODELS: Dict[str, Dict[str, str]] = {
+    # OpenAI 모델
     "gpt-3.5-turbo": {
         "display_name": "GPT-3.5 Turbo",
         "description": "OpenAI의 가성비 좋은 모델 - 빠른 응답 속도",
+        "provider": "openai",
     },
     "gpt-4o-mini": {
         "display_name": "GPT-4o Mini",
         "description": "OpenAI의 빠르고 저렴한 최신 모델 - 번역에 최적화",
+        "provider": "openai",
     },
     "gpt-4o": {
         "display_name": "GPT-4o",
         "description": "OpenAI의 가장 강력한 모델 - 최고 품질 번역",
+        "provider": "openai",
+    },
+    # Google Translate
+    "google-translate": {
+        "display_name": "Google Translate",
+        "description": "구글 번역 - 빠르고 정확한 무료 번역",
+        "provider": "google",
+    },
+    # DeepL NMT
+    "deepl-nmt": {
+        "display_name": "DeepL NMT",
+        "description": "DeepL 신경망 번역 - 자연스러운 번역",
+        "provider": "deepl",
+    },
+    # Post-Editor (DeepL + GPT-4o)
+    "deepl-post-edited": {
+        "display_name": "DeepL + GPT-4o (Post-Edited)",
+        "description": "DeepL 번역 후 GPT-4o로 후수정 - 최고 품질",
+        "provider": "post-editor",
     },
 }
 
