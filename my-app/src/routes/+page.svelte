@@ -34,7 +34,15 @@
     let selectedAIModel: string = "";
 
     // 자연어 리스트
-    let languages: string[] = ["한국어", "English", "日本語", "中文"];
+    let languages: string[] = [
+        "한국어",
+        "English",
+        "日本語",
+        "中文",
+        "Español",
+        "Français",
+        "Deutsch",
+    ];
 
     // 언어 코드 매핑
     const languageCodeMap: { [key: string]: string } = {
@@ -42,6 +50,9 @@
         English: "en",
         日本語: "ja",
         中文: "zh",
+        Español: "es",
+        Français: "fr",
+        Deutsch: "de",
     };
 
     // 선택된 입력 언어
@@ -108,11 +119,13 @@
                     : "모델 목록을 가져오는데 실패했습니다.";
             console.error("Error fetching models:", err);
 
-            // 폴백: Lemonade Server 기본 모델 사용
-            aiModels = ["Qwen3-4B-Instruct", "Gemma-3-4B-IT", "GPT-OSS-20B"];
-            modelMap.set("Qwen3-4B-Instruct", "Qwen3-4B-Instruct-2507-GGUF");
-            modelMap.set("Gemma-3-4B-IT", "Gemma-3-4b-it-GGUF");
-            modelMap.set("GPT-OSS-20B", "gpt-oss-20b-mxfp4-GGUF");
+            // 폴백: 기본 모델 사용 (백엔드 연결 실패 시)
+            aiModels = ["GPT-3.5 Turbo", "GPT-4o Mini", "GPT-4o", "Google Translate", "DeepL NMT"];
+            modelMap.set("GPT-3.5 Turbo", "gpt-3.5-turbo");
+            modelMap.set("GPT-4o Mini", "gpt-4o-mini");
+            modelMap.set("GPT-4o", "gpt-4o");
+            modelMap.set("Google Translate", "google-translate");
+            modelMap.set("DeepL NMT", "deepl-nmt");
         } finally {
             isLoading = false;
         }
