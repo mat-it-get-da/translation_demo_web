@@ -2,12 +2,11 @@
 Google Translate를 사용한 번역 모듈 (googletrans 사용)
 """
 
-import asyncio
 from fastapi import HTTPException
 from googletrans import Translator
 
 
-def translate(text: str, src: str, dest: str) -> str:
+async def translate(text: str, src: str, dest: str) -> str:
     """
     Google Translate를 사용하여 텍스트를 번역합니다.
 
@@ -26,7 +25,8 @@ def translate(text: str, src: str, dest: str) -> str:
         번역된 텍스트
     """
     translator = Translator()
-    result = translator.translate(text, src=src, dest=dest)
+    # googletrans의 translate가 비동기일 수 있으므로 await 사용
+    result = await translator.translate(text, src=src, dest=dest)
     return result.text
 
 
@@ -61,8 +61,8 @@ async def translate_with_google(
         # source_lang이 "auto"인 경우 src를 생략하거나 "auto"로 설정
         src = source_lang if source_lang != "auto" else "auto"
 
-        # 동기 함수를 비동기로 실행
-        result = await asyncio.to_thread(translate, text, src, target_lang)
+        # 비동기 함수 직접 호출
+        result = await translate(text, src, target_lang)
         return result
 
     except Exception as e:
