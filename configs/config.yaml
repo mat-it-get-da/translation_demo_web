@@ -1,6 +1,6 @@
 # OpenAI API 기반 번역기 메인 설정
 defaults:
-  - model: gpt4o-mini
+  - model: gpt-4o-mini
 
 # 기본 번역 설정
 translation:
