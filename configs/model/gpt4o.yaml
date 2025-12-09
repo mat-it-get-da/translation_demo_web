@@ -1,6 +1,0 @@
-# GPT-4o 모델 설정 (최고 품질)
-name: "gpt-4o"
-provider: "openai"
-temperature: 0.3
-max_tokens: 1024
-

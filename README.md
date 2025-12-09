@@ -116,9 +116,6 @@ translation_demo_web/
 │   │   ├── components/  # UI 컴포넌트
 │   │   └── routes/      # 페이지 라우트
 │   └── package.json
-├── configs/             # Hydra 설정 파일
-│   ├── config.yaml      # 메인 설정
-│   └── model/           # OpenAI 모델별 설정
 ├── .env                 # 환경 변수 (API 키, Git에 미포함)
 ├── .env.example         # 환경 변수 템플릿
 ├── .gitignore           # Git 제외 파일 목록
