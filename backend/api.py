@@ -4,35 +4,38 @@ FastAPI 번역 서버
 OpenAI, Google Translate, DeepL을 지원하는 번역 API
 """
 
-import sys
-from pathlib import Path
-
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
 
-# 프로젝트 루트를 Python 경로에 추가
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+from dotenv import load_dotenv
+import os
 
-from backend.models_config import (
+from .models_config import (
     AVAILABLE_MODELS,
     get_model_list,
     get_language_code,
-    get_language_name,
 )
 
 # 번역기 모듈 import
-from backend.translators import (
+from .translators import (
     translate_with_openai,
     translate_with_google,
     translate_with_deepl,
     translate_with_post_editor,
-    init_deepl_client,
 )
 
-# DeepL 클라이언트 초기화
-init_deepl_client()
+# 스키마 모델 import
+from .schemas import (
+    TranslationRequest,
+    TranslationResponse,
+    ModelProfile,
+    ModelProfiles,
+)
+
+load_dotenv()
+
+host = os.getenv("SERVER_HOST", "0.0.0.0")
+port = int(os.getenv("SERVER_PORT", 8000))
 
 # FastAPI 앱 초기화
 app = FastAPI(
@@ -45,48 +48,13 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:4173",
-        "http://localhost:5174",
-        "https://mat-it-get-da.github.io",  # GitHub Pages
+        "http://localhost:5173",  # Vite Development Mode (default port)
+        "http://localhost:4173",  # Vite Production Mode (default port)
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# Request/Response 모델
-class TranslateRequest(BaseModel):
-    """번역 요청 모델"""
-
-    text: str = Field(..., description="번역할 텍스트", min_length=1)
-    source_lang: str = Field(..., description="원본 언어 (예: 'en', 'ko')")
-    target_lang: str = Field(..., description="목표 언어 (예: 'en', 'ko')")
-    model: str = Field(..., description="사용할 모델 ID")
-
-
-class TranslateResponse(BaseModel):
-    """번역 응답 모델"""
-
-    translated_text: str = Field(..., description="번역된 텍스트")
-    model: str = Field(..., description="사용된 모델 ID")
-    source_lang: str = Field(..., description="원본 언어")
-    target_lang: str = Field(..., description="목표 언어")
-
-
-class ModelInfo(BaseModel):
-    """모델 정보 모델"""
-
-    id: str
-    name: str
-    description: str
-
-
-class ModelsResponse(BaseModel):
-    """모델 목록 응답 모델"""
-
-    models: list[ModelInfo]
 
 
 # API 엔드포인트
@@ -105,22 +73,22 @@ async def root():
     }
 
 
-@app.get("/api/models", response_model=ModelsResponse)
+@app.get("/api/models", response_model=ModelProfiles)
 async def get_models():
     """
     사용 가능한 모델 목록 반환
 
     Returns
     -------
-    ModelsResponse
+    ModelProfiles
         모델 정보 리스트
     """
     models = get_model_list()
-    return ModelsResponse(models=[ModelInfo(**model) for model in models])
+    return ModelProfiles(models=[ModelProfile(**model) for model in models])
 
 
-@app.post("/api/translate", response_model=TranslateResponse)
-async def translate(request: TranslateRequest):
+@app.post("/api/translate", response_model=TranslationResponse)
+async def translate(request: TranslationRequest):
     """
     텍스트 번역 - OpenAI, Google Translate, DeepL 지원
 
@@ -163,31 +131,23 @@ async def translate(request: TranslateRequest):
             )
 
         elif provider == "deepl":
-            translated_text = translate_with_deepl(
+            translated_text = await translate_with_deepl(
                 request.text, source_lang, target_lang
             )
 
         elif provider == "post-editor":
-            source_name = get_language_name(source_lang)
-            target_name = get_language_name(target_lang)
             translated_text = await translate_with_post_editor(
                 request.text,
                 source_lang,
                 target_lang,
-                source_name,
-                target_name,
             )
 
         elif provider == "openai":
-            source_name = get_language_name(source_lang)
-            target_name = get_language_name(target_lang)
-            translated_text = translate_with_openai(
+            translated_text = await translate_with_openai(
                 request.text,
                 source_lang,
                 target_lang,
                 request.model,
-                source_name,
-                target_name,
             )
 
         else:
@@ -195,7 +155,7 @@ async def translate(request: TranslateRequest):
                 status_code=400, detail=f"알 수 없는 provider: {provider}"
             )
 
-        return TranslateResponse(
+        return TranslationResponse(
             translated_text=translated_text,
             model=request.model,
             source_lang=source_lang,
@@ -215,8 +175,8 @@ if __name__ == "__main__":
     print("FastAPI 번역 서버 시작 (OpenAI + Google + DeepL)")
     print("=" * 80)
     print()
-    print("서버 주소: http://localhost:8001")
-    print("API 문서: http://localhost:8001/docs")
+    print(f"서버 주소: http://{host}:{port}")
+    print(f"API 문서: http://{host}:{port}/docs")
     print()
 
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host=host, port=port)

@@ -14,6 +14,13 @@ OpenAI API 기반 번역 API 서버를 실행합니다.
 """
 
 import uvicorn
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+host = os.getenv("SERVER_HOST", "0.0.0.0")
+port = int(os.getenv("SERVER_PORT", 8000))
 
 if __name__ == "__main__":
     print("=" * 80)
@@ -21,9 +28,9 @@ if __name__ == "__main__":
     print("=" * 80)
     print()
     print("📍 서버 정보:")
-    print("  - 번역 API 서버: http://localhost:8001")
-    print("  - API 문서: http://localhost:8001/docs")
-    print("  - Interactive API: http://localhost:8001/redoc")
+    print(f"  - 번역 API 서버: http://{host}:{port}")
+    print(f"  - API 문서: http://{host}:{port}/docs")
+    print(f"  - Interactive API: http://{host}:{port}/redoc")
     print()
     print("📡 사용 가능한 엔드포인트:")
     print("  - GET  /api/models    - 모델 목록 조회")
@@ -41,12 +48,11 @@ if __name__ == "__main__":
     print("서버를 중지하려면 Ctrl+C를 누르세요.")
     print("=" * 80)
     print()
-    
+
     uvicorn.run(
         "backend.api:app",
-        host="0.0.0.0",
-        port=8001,
+        host=host,
+        port=port,
         reload=True,  # 코드 변경 시 자동 재시작
         log_level="info",
     )
-

@@ -39,9 +39,9 @@ AVAILABLE_MODELS: Dict[str, Dict[str, str]] = {
     },
     # Post-Editor (DeepL + GPT-4o)
     "deepl-post-edited": {
-        "display_name": "DeepL + GPT-4o (Post-Edited)",
+        "display_name": "DeepL + GPT-4o (Post-Editing)",
         "description": "DeepL 번역 후 GPT-4o로 후수정 - 최고 품질",
-        "provider": "post-editor",
+        "provider": "custom",
     },
 }
 
@@ -71,7 +71,7 @@ LANGUAGE_NAMES: Dict[str, str] = {
 def get_model_list() -> List[Dict[str, str]]:
     """
     프론트엔드에서 사용할 모델 목록 반환
-    
+
     Returns
     -------
     List[Dict[str, str]]
@@ -90,20 +90,20 @@ def get_model_list() -> List[Dict[str, str]]:
 def get_full_model_name(model_id: str) -> str:
     """
     모델 ID 유효성 검사 및 반환
-    
-    OpenAI API는 모델 ID를 그대로 사용하므로 
+
+    OpenAI API는 모델 ID를 그대로 사용하므로
     유효성 검사 후 동일한 ID를 반환합니다.
-    
+
     Parameters
     ----------
     model_id : str
         모델 ID (예: "gpt-4o-mini")
-    
+
     Returns
     -------
     str
         검증된 모델 ID (입력값과 동일)
-    
+
     Raises
     ------
     ValueError
@@ -111,22 +111,20 @@ def get_full_model_name(model_id: str) -> str:
     """
     if model_id not in AVAILABLE_MODELS:
         available = ", ".join(AVAILABLE_MODELS.keys())
-        raise ValueError(
-            f"Invalid model_id: {model_id}. Available models: {available}"
-        )
-    
+        raise ValueError(f"Invalid model_id: {model_id}. Available models: {available}")
+
     return model_id
 
 
 def get_language_code(language_name: str) -> str:
     """
     언어 전체 이름을 코드로 변환
-    
+
     Parameters
     ----------
     language_name : str
         언어 전체 이름 (예: "한국어", "English")
-    
+
     Returns
     -------
     str
@@ -138,16 +136,15 @@ def get_language_code(language_name: str) -> str:
 def get_language_name(language_code: str) -> str:
     """
     언어 코드를 영어 이름으로 변환
-    
+
     Parameters
     ----------
     language_code : str
         언어 코드 (예: "ko", "en")
-    
+
     Returns
     -------
     str
         영어 언어 이름 (예: "Korean", "English")
     """
     return LANGUAGE_NAMES.get(language_code, language_code)
-
