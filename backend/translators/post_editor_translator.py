@@ -7,15 +7,13 @@ DeepL NMT로 초기 번역을 수행한 후, GPT-4o로 번역을 세밀하게 �
 
 from fastapi import HTTPException
 from .deepl_translator import translate_with_deepl
-from .openai_translator import openai_client
+from .openai_translator import get_openai_client
 
 
 async def translate_with_post_editor(
     text: str,
     source_lang: str,
     target_lang: str,
-    source_name: str,
-    target_name: str,
 ) -> str:
     """
     DeepL NMT로 초기 번역 후 GPT-4o로 후수정합니다.
@@ -25,13 +23,9 @@ async def translate_with_post_editor(
     text : str
         번역할 텍스트
     source_lang : str
-        원본 언어 코드 (예: "en")
+        원본 언어 코드 (예: "en", "ko")
     target_lang : str
-        목표 언어 코드 (예: "ko")
-    source_name : str
-        원본 언어 이름 (예: "English")
-    target_name : str
-        목표 언어 이름 (예: "Korean")
+        목표 언어 코드 (예: "en", "ko")
 
     Returns
     -------
@@ -51,7 +45,7 @@ async def translate_with_post_editor(
     """
     # Step 1: DeepL NMT로 초기 번역
     try:
-        initial_translation = translate_with_deepl(text, source_lang, target_lang)
+        initial_translation = await translate_with_deepl(text, source_lang, target_lang)
         print(f"[Post-Editor] Step 1/2: DeepL 초기 번역 완료")
         print(f"[Post-Editor] DeepL 결과: {initial_translation[:80]}...")
     except HTTPException as e:
@@ -61,13 +55,10 @@ async def translate_with_post_editor(
         raise HTTPException(status_code=500, detail=f"DeepL 초기 번역 실패: {str(e)}")
 
     # Step 2: GPT-4o로 후수정
-    if not openai_client:
-        raise HTTPException(
-            status_code=500,
-            detail="OpenAI 클라이언트가 초기화되지 않았습니다.",
-        )
-
     try:
+        # 클라이언트 가져오기 (자동 초기화)
+        client = get_openai_client()
+
         # Post-editing 프롬프트
         system_prompt = """You are an expert post-editor specializing in refining machine translations.
 
@@ -83,6 +74,7 @@ Provide only the improved translation text without any explanations, notes, or a
 - Output must be in the target language only
 - Do not include source text or comparison comments
 - Focus on delivering the final, polished version
+- IMPORTANT: When referring to languages, use full language names (e.g., "English", "Korean", "Japanese"), NOT language codes (e.g., "en", "ko", "ja")
 </Output Format>
 
 <Format Explanations>
@@ -94,8 +86,8 @@ Consistency: Preserve the tone and style of the original text
 
         user_prompt = f"""Review and improve this machine translation.
 
-Source Language: {source_name}
-Target Language: {target_name}
+Source Language: {source_lang}
+Target Language: {target_lang}
 
 Original Text:
 {text}
@@ -103,11 +95,11 @@ Original Text:
 Machine Translation (DeepL NMT):
 {initial_translation}
 
-Task: Carefully review the machine translation and improve it to make it more natural, accurate, and culturally appropriate. Fix any awkward phrasing, grammatical errors, or unnatural expressions. Output only the improved translation in {target_name}."""
+Task: Carefully review the machine translation and improve it to make it more natural, accurate, and culturally appropriate. Fix any awkward phrasing, grammatical errors, or unnatural expressions. Output only the improved translation in the target language. Remember to use full language names (not codes) when referring to languages."""
 
         print(f"[Post-Editor] Step 2/2: GPT-4o 후수정 시작...")
 
-        response = openai_client.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4o",  # GPT-4o 사용
             messages=[
                 {"role": "system", "content": system_prompt},
