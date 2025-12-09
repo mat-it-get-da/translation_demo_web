@@ -7,7 +7,7 @@
 
     // API 기본 URL
     const API_BASE_URL =
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:8001";
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
     // 모델 정보 타입
     interface ModelInfo {
@@ -120,7 +120,13 @@
             console.error("Error fetching models:", err);
 
             // 폴백: 기본 모델 사용 (백엔드 연결 실패 시)
-            aiModels = ["GPT-3.5 Turbo", "GPT-4o Mini", "GPT-4o", "Google Translate", "DeepL NMT"];
+            aiModels = [
+                "GPT-3.5 Turbo",
+                "GPT-4o Mini",
+                "GPT-4o",
+                "Google Translate",
+                "DeepL NMT",
+            ];
             modelMap.set("GPT-3.5 Turbo", "gpt-3.5-turbo");
             modelMap.set("GPT-4o Mini", "gpt-4o-mini");
             modelMap.set("GPT-4o", "gpt-4o");
