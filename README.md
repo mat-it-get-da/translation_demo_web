@@ -231,6 +231,32 @@ pnpm build
 pnpm preview
 ```
 
+### Docker Compose로 배포
+
+```bash
+# .env 파일 설정 (필수)
+cp .env.example .env
+# .env 파일을 열고 API 키 설정
+
+# Docker Compose로 서비스 시작
+docker-compose up -d
+
+# 로그 확인
+docker-compose logs -f
+
+# 서비스 중지
+docker-compose down
+```
+
+**Docker Compose 서비스:**
+- **Backend**: http://localhost:8000 (기본값, BACKEND_PORT 환경 변수로 변경 가능)
+- **Frontend**: http://localhost:80 (기본값, FRONTEND_PORT 환경 변수로 변경 가능)
+
+**환경 변수:**
+- `BACKEND_PORT`: 백엔드 포트 (기본값: 8000)
+- `FRONTEND_PORT`: 프론트엔드 포트 (기본값: 80)
+- `VITE_API_BASE_URL`: 프론트엔드에서 사용할 API URL (기본값: http://backend:8000)
+
 ## 기여 방법
 
 1. Fork the repository

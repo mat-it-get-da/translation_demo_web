@@ -4,9 +4,9 @@ FastAPI 서버 실행 스크립트
 OpenAI API 기반 번역 API 서버를 실행합니다.
 
 실행 방법:
-    rye run python -m backend.run_server
+    uv run python -m backend.run_server
     또는
-    rye run python backend/run_server.py
+    uv run python backend/run_server.py
 
 주의사항:
     - .env 파일에 OPENAI_API_KEY가 설정되어 있어야 합니다
@@ -49,10 +49,13 @@ if __name__ == "__main__":
     print("=" * 80)
     print()
 
+    # 프로덕션 환경에서는 reload 비활성화
+    reload = os.getenv("ENV", "production") == "development"
+
     uvicorn.run(
         "backend.api:app",
         host=host,
         port=port,
-        reload=True,  # 코드 변경 시 자동 재시작
+        reload=reload,
         log_level="info",
     )

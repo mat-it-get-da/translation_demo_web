@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: translation-backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEEPL_API_KEY=${DEEPL_API_KEY}
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - translation-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        # 빌드 시점에 API URL 설정
+        # nginx 프록시를 사용하므로 상대 경로(빈 문자열) 또는 절대 URL 사용 가능
+        # 같은 도메인에서 서비스하는 경우 상대 경로 권장
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-}
+    container_name: translation-frontend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - translation-network
+
+networks:
+  translation-network:
+    driver: bridge
+

@@ -6,8 +6,8 @@
     import TranslationHistory from "../components/TranslationHistory.svelte";
 
     // API 기본 URL
-    const API_BASE_URL =
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+    // 환경 변수가 설정되지 않은 경우 상대 경로 사용 (nginx 프록시 활용)
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
     // 모델 정보 타입
     interface ModelInfo {
