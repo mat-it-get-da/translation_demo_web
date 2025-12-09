@@ -55,8 +55,8 @@ rye sync
 ### 4. 프론트엔드 설정
 
 ```bash
-# my-app 디렉토리로 이동
-cd my-app
+# frontend 디렉토리로 이동
+cd frontend
 
 # pnpm이 설치되어 있지 않다면 먼저 설치
 # npm install -g pnpm
@@ -85,8 +85,8 @@ rye run python -m backend.run_server
 터미널 2에서:
 
 ```bash
-# my-app 디렉토리에서
-cd my-app
+# frontend 디렉토리에서
+cd frontend
 pnpm dev
 ```
 
@@ -108,10 +108,12 @@ pnpm dev
 ```
 translation_demo_web/
 ├── backend/              # FastAPI 백엔드
-│   ├── api.py           # API 엔드포인트 (OpenAI 연결)
-│   ├── models_config.py # OpenAI 모델 설정
+│   ├── api.py           # API 엔드포인트
+│   ├── models_config.py # 모델 설정
+│   ├── schemas/         # API 스키마 모델
+│   ├── translators/     # 번역기 모듈
 │   └── run_server.py    # 서버 실행 스크립트
-├── my-app/              # SvelteKit 프론트엔드
+├── frontend/            # SvelteKit 프론트엔드
 │   ├── src/
 │   │   ├── components/  # UI 컴포넌트
 │   │   └── routes/      # 페이지 라우트
@@ -214,7 +216,7 @@ Error: You exceeded your current quota
 ### 프론트엔드 테스트
 
 ```bash
-cd my-app
+cd frontend
 pnpm test
 ```
 
@@ -222,7 +224,7 @@ pnpm test
 
 ```bash
 # 프론트엔드 빌드
-cd my-app
+cd frontend
 pnpm build
 
 # 빌드 결과 미리보기
