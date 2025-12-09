@@ -32,10 +32,6 @@ charset-normalizer==3.4.4
     # via requests
 click==8.3.0
     # via uvicorn
-colorama==0.4.6
-    # via click
-    # via tqdm
-    # via uvicorn
 deep-translator==1.11.4
     # via project-wed
 deepl==1.25.0
@@ -105,6 +101,8 @@ urllib3==2.5.0
     # via requests
 uvicorn==0.38.0
     # via project-wed
+uvloop==0.22.1
+    # via uvicorn
 watchfiles==1.1.1
     # via uvicorn
 websockets==15.0.1
