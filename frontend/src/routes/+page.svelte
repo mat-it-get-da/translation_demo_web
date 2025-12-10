@@ -6,8 +6,31 @@
     import TranslationHistory from "../components/TranslationHistory.svelte";
 
     // API 기본 URL
-    // 환경 변수가 설정되지 않은 경우 상대 경로 사용 (nginx 프록시 활용)
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+    // VITE_API_BASE_URL이 설정되어 있으면 사용
+    // 없으면:
+    // - Caddy 프록시를 사용하는 경우: 상대 경로 (빈 문자열) - 같은 도메인에서 /api/*로 프록시
+    // - 직접 백엔드로 연결하는 경우: VITE_BACKEND_PORT를 사용하여 백엔드 포트로 연결
+    const getApiBaseUrl = () => {
+        const viteUrl = import.meta.env.VITE_API_BASE_URL;
+        if (viteUrl !== undefined && viteUrl !== "") return viteUrl;
+
+        // VITE_API_BASE_URL이 빈 문자열이면 Caddy 프록시 사용 (상대 경로)
+        // Caddy가 /api/*를 backend:8000으로 프록시하므로 포트가 필요 없음
+        if (viteUrl === "") return "";
+
+        // VITE_API_BASE_URL이 설정되지 않았고, VITE_BACKEND_PORT가 있으면 직접 연결
+        const backendPort = import.meta.env.VITE_BACKEND_PORT;
+        if (backendPort) {
+            const host = window.location.hostname;
+            const protocol = window.location.protocol;
+            return `${protocol}//${host}:${backendPort}`;
+        }
+
+        // 기본값: Caddy 프록시 사용 (상대 경로)
+        return "";
+    };
+
+    const API_BASE_URL = getApiBaseUrl();
 
     // 모델 정보 타입
     interface ModelInfo {
