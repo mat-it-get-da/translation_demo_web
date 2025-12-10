@@ -31,12 +31,23 @@ services:
       dockerfile: frontend/Dockerfile
       args:
         # 빌드 시점에 API URL 설정
-        # nginx 프록시를 사용하므로 상대 경로(빈 문자열) 또는 절대 URL 사용 가능
+        # Caddy 프록시를 사용하므로 상대 경로(빈 문자열) 또는 절대 URL 사용 가능
         # 같은 도메인에서 서비스하는 경우 상대 경로 권장
         - VITE_API_BASE_URL=${VITE_API_BASE_URL:-}
+        # 백엔드 포트 정보 전달 (런타임에 사용 가능하도록)
+        - VITE_BACKEND_PORT=${BACKEND_PORT:-8000}
     container_name: translation-frontend
     ports:
       - "${FRONTEND_PORT:-80}:80"
+      - "${FRONTEND_HTTPS_PORT:-443}:443"
+    environment:
+      # Caddy 자동 HTTPS 설정 (프로덕션용)
+      # CADDY_DOMAIN이 설정되어 있으면 자동으로 프로덕션 모드로 전환
+      - CADDY_DOMAIN=${CADDY_DOMAIN:-}
+    volumes:
+      # Caddy 데이터 디렉토리 (인증서 저장)
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
       backend:
         condition: service_healthy
@@ -47,4 +58,10 @@ services:
 networks:
   translation-network:
     driver: bridge
+
+volumes:
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
 

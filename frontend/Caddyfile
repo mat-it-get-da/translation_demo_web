@@ -1,0 +1,103 @@
+{
+	# 로컬 개발 환경에서는 자동 HTTPS 비활성화
+	# 프로덕션에서는 도메인을 설정하면 자동으로 활성화됨
+	auto_https off
+}
+
+# HTTP 서버 (로컬 개발용)
+:80 {
+	# 백엔드 API 프록시 (우선 처리)
+	handle /api/* {
+		reverse_proxy backend:8000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote}
+			header_up X-Forwarded-For {remote}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# 루트 디렉토리 설정 (vite 빌드 결과물)
+	root * /usr/share/caddy
+
+	# 정적 파일 캐싱 (JS, CSS, 이미지 등)
+	@static {
+		path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot *.webp *.avif
+	}
+	handle @static {
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+
+	# 프론트엔드 정적 파일 서빙 (SPA 라우팅 지원)
+	# try_files는 파일이 없을 때 index.html로 폴백
+	try_files {path} /index.html
+	file_server
+
+	# Gzip 압축
+	encode gzip
+}
+
+# HTTPS 서버 (프로덕션용)
+# 도메인을 설정하려면:
+# 1. .env 파일에 CADDY_DOMAIN=your-domain.com 설정
+# 2. DNS에서 도메인을 서버 IP로 설정
+# 3. docker-compose.yml에서 CADDY_DOMAIN 환경 변수 전달 확인
+# 4. 아래 주석을 해제하고 도메인을 실제 도메인으로 변경
+#
+# example.com {
+# 	# Let's Encrypt 자동 인증서 발급
+# 	# HTTP to HTTPS 자동 리다이렉트
+# 	redir https://{host}{uri} permanent
+# }
+#
+# https://example.com {
+# 	# Let's Encrypt 자동 인증서 발급 (DNS 챌린지 사용)
+# 	tls {
+# 		dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+# 		# 또는 다른 DNS 제공자 사용 가능:
+# 		# dns route53 {env.AWS_ACCESS_KEY_ID} {env.AWS_SECRET_ACCESS_KEY}
+# 		# dns digitalocean {env.DIGITALOCEAN_API_TOKEN}
+# 		# dns gandi {env.GANDI_API_KEY}
+# 	}
+#
+# 	# 백엔드 API 프록시 (우선 처리)
+# 	handle /api/* {
+# 		reverse_proxy backend:8000 {
+# 			header_up Host {host}
+# 			header_up X-Real-IP {remote}
+# 			header_up X-Forwarded-For {remote}
+# 			header_up X-Forwarded-Proto {scheme}
+# 		}
+# 	}
+#
+# 	# FastAPI 문서 및 헬스체크 엔드포인트 프록시
+# 	handle /docs {
+# 		reverse_proxy backend:8000
+# 	}
+# 	handle /redoc {
+# 		reverse_proxy backend:8000
+# 	}
+# 	handle /openapi.json {
+# 		reverse_proxy backend:8000
+# 	}
+# 	handle /health {
+# 		reverse_proxy backend:8000
+# 	}
+#
+# 	# 정적 파일 캐싱
+# 	@static {
+# 		path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot
+# 	}
+# 	handle @static {
+# 		header Cache-Control "public, max-age=31536000, immutable"
+# 		file_server
+# 	}
+#
+# 	# 프론트엔드 정적 파일 서빙 (SPA 라우팅 지원)
+# 	root * /usr/share/caddy
+# 	file_server
+# 	try_files {path} /index.html
+#
+# 	# Gzip 압축
+# 	encode gzip
+# }

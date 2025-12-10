@@ -250,12 +250,22 @@ docker-compose down
 
 **Docker Compose 서비스:**
 - **Backend**: http://localhost:8000 (기본값, BACKEND_PORT 환경 변수로 변경 가능)
-- **Frontend**: http://localhost:80 (기본값, FRONTEND_PORT 환경 변수로 변경 가능)
+- **Frontend**: http://localhost:8080 (기본값, FRONTEND_PORT 환경 변수로 변경 가능)
+- **Frontend HTTPS**: https://localhost:443 (프로덕션 환경에서 도메인 설정 시 자동 활성화)
 
 **환경 변수:**
 - `BACKEND_PORT`: 백엔드 포트 (기본값: 8000)
-- `FRONTEND_PORT`: 프론트엔드 포트 (기본값: 80)
-- `VITE_API_BASE_URL`: 프론트엔드에서 사용할 API URL (기본값: http://backend:8000)
+- `FRONTEND_PORT`: 프론트엔드 HTTP 포트 (기본값: 80)
+- `FRONTEND_HTTPS_PORT`: 프론트엔드 HTTPS 포트 (기본값: 443)
+- `VITE_API_BASE_URL`: 프론트엔드에서 사용할 API URL (기본값: 빈 문자열, Caddy 프록시 사용)
+- `CADDY_DOMAIN`: HTTPS를 위한 도메인 (설정 시 Let's Encrypt 자동 인증서 발급)
+- `CLOUDFLARE_API_TOKEN`: Cloudflare DNS를 사용하는 경우 API 토큰
+
+**HTTPS 설정 (프로덕션):**
+1. `.env` 파일에 `CADDY_DOMAIN=your-domain.com` 설정
+2. DNS에서 도메인을 서버 IP로 설정
+3. `frontend/Caddyfile`에서 HTTPS 설정 주석 해제 및 DNS 제공자 설정
+4. Docker Compose 재시작 시 자동으로 Let's Encrypt 인증서 발급
 
 ## 기여 방법
 
